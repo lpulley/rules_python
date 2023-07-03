@@ -137,11 +137,23 @@ def pip_install_dependencies():
     versions.check(MINIMUM_BAZEL_VERSION)
 
     for (name, url, sha256) in _RULE_DEPS:
-        maybe(
-            http_archive,
-            name,
-            url = url,
-            sha256 = sha256,
-            type = "zip",
-            build_file_content = _GENERIC_WHEEL,
-        )
+        if name == "pypi__pip_tools":
+            # Force patching pip-tools 9cac0133d640644db17dd4aefa3dbcf72d3 onto pypi__pip_tools
+            maybe(
+                http_archive,
+                name,
+                url = url,
+                sha256 = sha256,
+                type = "zip",
+                build_file_content = _GENERIC_WHEEL,
+                patches = ["@rules_python//:9cac0133d640644db17dd4aefa3dbcf72d3.patch"]
+            )
+        else:
+            maybe(
+                http_archive,
+                name,
+                url = url,
+                sha256 = sha256,
+                type = "zip",
+                build_file_content = _GENERIC_WHEEL,
+            )
